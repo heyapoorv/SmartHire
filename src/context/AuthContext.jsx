@@ -244,7 +244,6 @@
 // export function useAuth() {
 //   return useContext(AuthContext);
 // }
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import {
   getAuth,
@@ -255,15 +254,13 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from 'firebase/auth';
-
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../firebase'; // Adjust the path if needed
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-
-// ✅ Setup Google provider with prompt
+// Setup Google provider with prompt
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
@@ -274,40 +271,49 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ✅ Google Sign-In Function
+  // Google Sign-In Function
   async function signInWithGoogle(userType = 'candidate') {
     try {
       setLoading(true);
       const result = await signInWithPopup(auth, googleProvider);
-
       const user = result.user;
       const token = await user.getIdToken();
-
+      
       if (!user.email) {
         throw new Error('Email not returned from Google login.');
       }
-
+      
       console.log('Google User:', user);
       console.log('Firebase Token:', token);
-
+      
       // Store userType locally
       localStorage.setItem('userType', userType);
-
-      // ✅ Send token to your backend
+      
+      // Send token to your backend - ensure parameter name matches what backend expects
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token }), // Using 'token' as the key
       });
-
+      
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || 'Login failed');
       }
-
+      
       console.log('Backend login successful:', data);
-      return { user, userType };
+      
+      // Enhance the user object with the backend user ID and other data
+      const enhancedUser = {
+        ...user,
+        userType,
+        id: data.user.id,
+        role: data.user.role,
+        dbName: data.user.name
+      };
+      
+      setCurrentUser(enhancedUser);
+      return enhancedUser;
     } catch (err) {
       console.error('Google Login Error:', err.message);
       setError(err.message);
@@ -317,33 +323,107 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // Email/password SignUp
-  function signUp(email, password, userType = 'candidate') {
-    localStorage.setItem('userType', userType);
-    return createUserWithEmailAndPassword(auth, email, password)
-      .then((res) => ({ ...res.user, userType }))
-      .catch((error) => {
-        console.error('Signup Error:', error.message);
-        setError(error.message);
-        throw error;
+  // Email/password SignUp with backend integration
+  async function signUp(email, password, userType = 'candidate', name) {
+    try {
+      localStorage.setItem('userType', userType);
+      
+      // Create the user in Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+      
+      // Register user in your backend
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          token,
+          email,
+          name,
+          role: userType.toUpperCase() // If your backend expects uppercase enum values
+        }),
       });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'User creation failed on backend');
+      }
+      
+      // Enhance user with backend data
+      const enhancedUser = {
+        ...user,
+        userType,
+        id: data.user.id,
+        role: data.user.role,
+        dbName: name
+      };
+      
+      setCurrentUser(enhancedUser);
+      return enhancedUser;
+    } catch (error) {
+      console.error('Signup Error:', error.message);
+      setError(error.message);
+      
+      // If Firebase account was created but backend failed, 
+      // try to clean up the Firebase account
+      try {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          await currentUser.delete();
+        }
+      } catch (deleteError) {
+        console.error('Error deleting incomplete user:', deleteError);
+      }
+      
+      throw error;
+    }
   }
 
-  // Email/password LogIn
-  function logIn(email, password, userType = 'candidate') {
-    localStorage.setItem('userType', userType);
-    return signInWithEmailAndPassword(auth, email, password)
-      .then((res) => ({ ...res.user, userType }))
-      .catch((error) => {
-        console.error('Login Error:', error.message);
-        setError(error.message);
-        throw error;
+  // Email/password LogIn with backend integration
+  async function logIn(email, password, userType = 'candidate') {
+    try {
+      localStorage.setItem('userType', userType);
+      
+      // Login with Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+      
+      // Login to backend
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
       });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Backend login failed');
+      }
+      
+      // Enhance user with backend data
+      const enhancedUser = {
+        ...user,
+        userType,
+        id: data.user.id,
+        role: data.user.role,
+        dbName: data.user.name
+      };
+      
+      setCurrentUser(enhancedUser);
+      return enhancedUser;
+    } catch (error) {
+      console.error('Login Error:', error.message);
+      setError(error.message);
+      throw error;
+    }
   }
 
   // LogOut
   function logOut() {
     localStorage.removeItem('userType');
+    setCurrentUser(null);
     return signOut(auth)
       .catch((error) => {
         console.error('Logout Error:', error.message);
@@ -352,19 +432,50 @@ export function AuthProvider({ children }) {
       });
   }
 
-  // Auth state listener
+  // Auth state listener to fetch user data from backend when Firebase auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log('User state changed:', user);
-      const userType = localStorage.getItem('userType') || 'candidate';
+      
       if (user) {
-        setCurrentUser({ ...user, userType });
+        try {
+          const userType = localStorage.getItem('userType') || 'candidate';
+          const token = await user.getIdToken();
+          
+          // Get user data from backend on auth state change
+          const response = await fetch(`http://localhost:5000/api/user/by-email/${user.email}`, {
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            const enhancedUser = {
+              ...user,
+              userType,
+              id: data.id,
+              role: data.role,
+              dbName: data.name
+            };
+            setCurrentUser(enhancedUser);
+          } else {
+            // If backend fetch fails, still set user with Firebase data
+            setCurrentUser({ ...user, userType });
+          }
+        } catch (error) {
+          console.error('Error fetching user data from backend:', error);
+          const userType = localStorage.getItem('userType') || 'candidate';
+          setCurrentUser({ ...user, userType });
+        }
       } else {
         setCurrentUser(null);
       }
+      
       setLoading(false);
     });
-
+    
     return () => unsubscribe();
   }, []);
 
@@ -381,4 +492,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
-

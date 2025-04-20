@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import axios from "axios"; // Make sure to import axios
 
 const skills = [
   "JavaScript", "React", "Node.js", "Python", "Java", "AWS", 
@@ -18,14 +19,14 @@ const JobPreferencesForm = () => {
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
-    jobTitle: "",
-    location: "",
-    remotePreference: "no-preference",
-    salary: "",
-    experience: "",
-    selectedSkills: [],
-    selectedIndustries: [],
-    bio: ""
+    desiredJobTitle: "",
+    preferredLocation: "",
+    remotePreference: "No Preference",
+    salaryRange: "",
+    yearsOfExperience: "",
+    skills: [],
+    industries: [],
+    professionalSummary: ""
   });
   
   const [loading, setLoading] = useState(false);
@@ -34,11 +35,21 @@ const JobPreferencesForm = () => {
 
   // Load saved preferences if they exist
   useEffect(() => {
-    const savedPreferences = localStorage.getItem("jobPreferences");
-    if (savedPreferences) {
-      setFormData(JSON.parse(savedPreferences));
-    }
-  }, []);
+    const fetchUserPreferences = async () => {
+      if (!currentUser || !currentUser.id) return;
+      
+      try {
+        const response = await axios.get(`http://localhost:5000/user/${currentUser.id}`);
+        if (response.data.preferences) {
+          setFormData(response.data.preferences);
+        }
+      } catch (err) {
+        console.error("Error fetching user preferences:", err);
+      }
+    };
+
+    fetchUserPreferences();
+  }, [currentUser]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,15 +61,15 @@ const JobPreferencesForm = () => {
 
   const handleSkillToggle = (skill) => {
     setFormData(prev => {
-      if (prev.selectedSkills.includes(skill)) {
+      if (prev.skills.includes(skill)) {
         return {
           ...prev,
-          selectedSkills: prev.selectedSkills.filter(s => s !== skill)
+          skills: prev.skills.filter(s => s !== skill)
         };
       } else {
         return {
           ...prev,
-          selectedSkills: [...prev.selectedSkills, skill]
+          skills: [...prev.skills, skill]
         };
       }
     });
@@ -66,15 +77,15 @@ const JobPreferencesForm = () => {
 
   const handleIndustryToggle = (industry) => {
     setFormData(prev => {
-      if (prev.selectedIndustries.includes(industry)) {
+      if (prev.industries.includes(industry)) {
         return {
           ...prev,
-          selectedIndustries: prev.selectedIndustries.filter(i => i !== industry)
+          industries: prev.industries.filter(i => i !== industry)
         };
       } else {
         return {
           ...prev,
-          selectedIndustries: [...prev.selectedIndustries, industry]
+          industries: [...prev.industries, industry]
         };
       }
     });
@@ -83,7 +94,7 @@ const JobPreferencesForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.jobTitle || !formData.location) {
+    if (!formData.desiredJobTitle || !formData.preferredLocation) {
       return setError("Job title and location are required");
     }
     
@@ -91,20 +102,22 @@ const JobPreferencesForm = () => {
       setError("");
       setLoading(true);
       
-      // In a real app, this would be an API call
-      // For now, just save to localStorage
-      localStorage.setItem("jobPreferences", JSON.stringify(formData));
+      // Send preferences to the API
+      await axios.put("http://localhost:5000/user/preferences", {
+        userId: currentUser.id,
+        preferences: formData
+      });
       
       setSuccess(true);
       setTimeout(() => {
         navigate("/candidate-dashboard");
       }, 2000);
     } catch (err) {
-      setError("Failed to save preferences");
+      setError("Failed to save preferences: " + (err.response?.data?.error || err.message));
       console.error(err);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -127,8 +140,8 @@ const JobPreferencesForm = () => {
               <label className="block text-gray-700 mb-2 font-medium">Desired Job Title*</label>
               <input
                 type="text"
-                name="jobTitle"
-                value={formData.jobTitle}
+                name="desiredJobTitle"
+                value={formData.desiredJobTitle}
                 onChange={handleChange}
                 placeholder="e.g., Front-end Developer"
                 className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
@@ -140,8 +153,8 @@ const JobPreferencesForm = () => {
               <label className="block text-gray-700 mb-2 font-medium">Preferred Location*</label>
               <input
                 type="text"
-                name="location"
-                value={formData.location}
+                name="preferredLocation"
+                value={formData.preferredLocation}
                 onChange={handleChange}
                 placeholder="e.g., New York, NY"
                 className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
@@ -158,10 +171,10 @@ const JobPreferencesForm = () => {
               onChange={handleChange}
               className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
             >
-              <option value="no-preference">No Preference</option>
-              <option value="remote-only">Remote Only</option>
-              <option value="hybrid">Hybrid</option>
-              <option value="on-site">On-site Only</option>
+              <option value="No Preference">No Preference</option>
+              <option value="Remote">Remote Only</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="On-site">On-site Only</option>
             </select>
           </div>
 
@@ -170,8 +183,8 @@ const JobPreferencesForm = () => {
               <label className="block text-gray-700 mb-2 font-medium">Expected Salary Range</label>
               <input
                 type="text"
-                name="salary"
-                value={formData.salary}
+                name="salaryRange"
+                value={formData.salaryRange}
                 onChange={handleChange}
                 placeholder="e.g., $60,000 - $80,000"
                 className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
@@ -181,17 +194,17 @@ const JobPreferencesForm = () => {
             <div>
               <label className="block text-gray-700 mb-2 font-medium">Years of Experience</label>
               <select
-                name="experience"
-                value={formData.experience}
+                name="yearsOfExperience"
+                value={formData.yearsOfExperience}
                 onChange={handleChange}
                 className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               >
                 <option value="">Select Experience Level</option>
-                <option value="0-1">0-1 years</option>
-                <option value="1-3">1-3 years</option>
-                <option value="3-5">3-5 years</option>
-                <option value="5-10">5-10 years</option>
-                <option value="10+">10+ years</option>
+                <option value="0-1 years">0-1 years</option>
+                <option value="1-3 years">1-3 years</option>
+                <option value="3-5 years">3-5 years</option>
+                <option value="5-10 years">5-10 years</option>
+                <option value="10+ years">10+ years</option>
               </select>
             </div>
           </div>
@@ -205,10 +218,9 @@ const JobPreferencesForm = () => {
                   type="button"
                   onClick={() => handleSkillToggle(skill)}
                   className={`px-3 py-1 rounded-full text-sm font-medium
-                    ${formData.selectedSkills.includes(skill) 
-                      ? 'bg-blue-400 text-gray-100 font-semibold'  // Selected: Slightly darker white, not too strong
-                      : 'bg-gray-200 text-gray-400 hover:text-gray-200 hover:bg-gray-300' // Default: Softer contrast
-                                
+                    ${formData.skills.includes(skill) 
+                      ? 'bg-blue-400 text-gray-100 font-semibold'
+                      : 'bg-gray-200 text-gray-400 hover:text-gray-200 hover:bg-gray-300'
                     }`}
                 >
                   {skill}
@@ -226,9 +238,9 @@ const JobPreferencesForm = () => {
                   type="button"
                   onClick={() => handleIndustryToggle(industry)}
                   className={`px-3 py-1 rounded-full text-sm font-medium
-                    ${formData.selectedIndustries.includes(industry) 
-                      ? 'bg-blue-400 text-gray-100 font-semibold'  // Selected: Slightly darker white, not too strong
-                      : 'bg-gray-200 text-gray-400 hover:text-gray-200 hover:bg-gray-300' // Default: Softer contrast
+                    ${formData.industries.includes(industry) 
+                      ? 'bg-blue-400 text-gray-100 font-semibold'
+                      : 'bg-gray-200 text-gray-400 hover:text-gray-200 hover:bg-gray-300'
                     }`}
                 >
                   {industry}
@@ -240,8 +252,8 @@ const JobPreferencesForm = () => {
           <div>
             <label className="block text-gray-700 mb-2 font-medium">Professional Summary</label>
             <textarea
-              name="bio"
-              value={formData.bio}
+              name="professionalSummary"
+              value={formData.professionalSummary}
               onChange={handleChange}
               placeholder="Briefly describe your background and career goals..."
               rows="4"
