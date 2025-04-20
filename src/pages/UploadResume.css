@@ -28,4 +28,15 @@
   .result {
     margin-top: 2rem;
   }
-  
+  /* Optional: Better visibility and font */
+.extract-box {
+  background-color: #f9f9f9;
+  color: #1f2937; /* Tailwind's gray-800 */
+  font-family: monospace;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db; /* Tailwind gray-300 */
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}

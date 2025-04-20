@@ -1,0 +1,63 @@
+Siddhant Vishnu
++Pune, India#siddhant.m.vishnu@gmail.com95455 72005
+ðSiddhant-Vishnu§Siddhant Vishnu
+Technical Skills
+Backend Development— NodeJS•Express•WebSockets
+DevOps— GitHub Workflows•Docker•Kubernetes
+Frontend Development— ReactJS•NextJS•Javascript•Tailwind CSS
+Miscellaneous— Amazon AWS•WebRTC•TurboRepo•Figma
+Projects
+Oasis - A Social Network Platform
+Link to Website
+2
+◦Frontend Team Leadfor a social media platform enabling users to post video, photo and text content
+◦ImplementedInfinite scroll feedwithauto-playing videos, enhancing user engagement
+◦Optimized videoloading withcaching techniques, reducing API calls by40%
+◦LedUI/UX designfor the platform ensuring a cohesive and user-friendly experience
+◦Builtkey features from scratch including,global feed, community feed,comments section
+◦Tools Used:  NextJS
+Steal or Sharegithub.com/repo
+2
+◦Designed a real-time multiplayer gamewith role-based access control and WebSocket communication,
+inspired by the Prisoner’s Dilemma
+◦Deployed on AWS EC2usingDockercontainers for Node.js and Redis, withAmazon RDSfor scala-
+bility, and implementedCI/CD pipelinewith GitHub Workflows for automated deployments
+◦Implemented rate limiting with Redisfor managing WebSocket connections, ensuring efficient player
+interaction handling during simultaneous game rounds
+◦Integrated Google Sheetsfor real-time event data management and game snapshot updates
+◦Tools Used:  NodeJS, Express, Docker, Redis
+Pok
+ ́
+emon - Pok
+ ́
+edexgithub.com/repo
+2
+◦Developed Pok
+ ́
+eCam, enabling users to instantly identify Pok ́emon by snapping pictures
+◦Enabled AI chatfeature with Pok ́emon, powered by Gemini’s API
+◦Added Starter Pok
+ ́
+emonfeature thatlevels upandevolvesbased onuser interactions
+◦Implemented Region mapshowcasingPok
+ ́
+emon locations, enhancing user navigation and exploration
+◦Integrated Pok
+ ́
+eAPIto provide detailed information on various Pok ́emon, including features and stats
+◦Tools Used:  NextJS
+Education
+Pune Institute of Computer Technology
+BE in Computer Engineering
+Class of 2027
+◦Current GPA: 9.91/10.0 (1st Year)
+Achievements and Awards
+Winner - Hackathon
+Secured 1st place in PICT IEEE student chapter’s internal hackathon “Tech Rush”
+July 2024
+Winner - LeetCode Mania
+Secured 3rd place in PICT ACM student chapter’s “LeetCode Mania” - A month
+long competition for solving leetcode problems
+July 2024
+Siddhant Vishnu - Page 1 of 1
+Last updated in November 2024

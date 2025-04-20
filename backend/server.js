@@ -1483,6 +1483,43 @@ app.get("/notifications/:userId", async (req, res) => {
 
 
 // Serve uploaded files
+// const { performOCRWithPaddle } = require('./utils/ocrUtils');
+
+// const uploadDir = 'uploads/';
+
+// // Ensure upload directory exists
+// if (!fs.existsSync(uploadDir)) {
+//   fs.mkdirSync(uploadDir, { recursive: true });
+// }
+
+// // Multer setup for file upload
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => cb(null, uploadDir),
+//   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+// });
+
+// const upload = multer({ storage });
+
+// // Serve uploaded files
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// // Route to upload a file and process OCR
+// app.post('/upload', upload.single('file'), async (req, res) => {
+//   const file = req.file;
+//   if (!file) {
+//     return res.status(400).send('No file uploaded.');
+//   }
+
+//   try {
+//     const filePath = path.join(__dirname, uploadDir, file.filename);
+//     const extractedText = await performOCRWithPaddle(filePath);  // Get OCR result
+
+//     res.json({ extractedText });  // Send OCR result as JSON response
+//   } catch (error) {
+//     console.error('Error processing file:', error);
+//     res.status(500).send('Error processing file.');
+//   }
+// });
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Ensure upload dir exists

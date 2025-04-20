@@ -58,4 +58,4 @@ async function signInWithGoogle() {
 }
 
 // Export the sign-in function and necessary Firebase auth components
-module.exports = { auth, provider, signInWithGoogle };
+module.exports = { auth, provider, signInWithGoogle 
