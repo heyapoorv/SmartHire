@@ -12,12 +12,13 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String?
-  name      String?
-  role      Role     @default(JOB_SEEKER)
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  password    String?
+  name        String?
+  role        Role     @default(JOB_SEEKER)
+  preferences Json?
+  createdAt   DateTime @default(now())
 
   resumes       Resume[] // Relation to Resume model
   jobs          Job[]          @relation("EmployerJobs")
@@ -48,6 +49,8 @@ model Employer {
 
 model Job {
   id          Int      @id @default(autoincrement())
+  salary      String   @default("salary to be updated")
+  type        String   @default("type not mentioned")
   employerId  Int
   title       String
   company     String

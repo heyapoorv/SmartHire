@@ -1736,6 +1736,7 @@ export namespace Prisma {
     password: number
     name: number
     role: number
+    preferences: number
     createdAt: number
     _all: number
   }
@@ -1773,6 +1774,7 @@ export namespace Prisma {
     password?: true
     name?: true
     role?: true
+    preferences?: true
     createdAt?: true
     _all?: true
   }
@@ -1869,6 +1871,7 @@ export namespace Prisma {
     password: string | null
     name: string | null
     role: $Enums.Role
+    preferences: JsonValue | null
     createdAt: Date
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
@@ -1897,6 +1900,7 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    preferences?: boolean
     createdAt?: boolean
     resumes?: boolean | User$resumesArgs<ExtArgs>
     jobs?: boolean | User$jobsArgs<ExtArgs>
@@ -1912,6 +1916,7 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    preferences?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["user"]>
 
@@ -1921,6 +1926,7 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    preferences?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["user"]>
 
@@ -1930,10 +1936,11 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    preferences?: boolean
     createdAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "name" | "role" | "createdAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "name" | "role" | "preferences" | "createdAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     resumes?: boolean | User$resumesArgs<ExtArgs>
     jobs?: boolean | User$jobsArgs<ExtArgs>
@@ -1960,6 +1967,7 @@ export namespace Prisma {
       password: string | null
       name: string | null
       role: $Enums.Role
+      preferences: Prisma.JsonValue | null
       createdAt: Date
     }, ExtArgs["result"]["user"]>
     composites: {}
@@ -2394,6 +2402,7 @@ export namespace Prisma {
     readonly password: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'Role'>
+    readonly preferences: FieldRef<"User", 'Json'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
   }
     
@@ -5154,6 +5163,8 @@ export namespace Prisma {
 
   export type JobMinAggregateOutputType = {
     id: number | null
+    salary: string | null
+    type: string | null
     employerId: number | null
     title: string | null
     company: string | null
@@ -5165,6 +5176,8 @@ export namespace Prisma {
 
   export type JobMaxAggregateOutputType = {
     id: number | null
+    salary: string | null
+    type: string | null
     employerId: number | null
     title: string | null
     company: string | null
@@ -5176,6 +5189,8 @@ export namespace Prisma {
 
   export type JobCountAggregateOutputType = {
     id: number
+    salary: number
+    type: number
     employerId: number
     title: number
     company: number
@@ -5199,6 +5214,8 @@ export namespace Prisma {
 
   export type JobMinAggregateInputType = {
     id?: true
+    salary?: true
+    type?: true
     employerId?: true
     title?: true
     company?: true
@@ -5210,6 +5227,8 @@ export namespace Prisma {
 
   export type JobMaxAggregateInputType = {
     id?: true
+    salary?: true
+    type?: true
     employerId?: true
     title?: true
     company?: true
@@ -5221,6 +5240,8 @@ export namespace Prisma {
 
   export type JobCountAggregateInputType = {
     id?: true
+    salary?: true
+    type?: true
     employerId?: true
     title?: true
     company?: true
@@ -5319,6 +5340,8 @@ export namespace Prisma {
 
   export type JobGroupByOutputType = {
     id: number
+    salary: string
+    type: string
     employerId: number
     title: string
     company: string
@@ -5349,6 +5372,8 @@ export namespace Prisma {
 
   export type JobSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    salary?: boolean
+    type?: boolean
     employerId?: boolean
     title?: boolean
     company?: boolean
@@ -5366,6 +5391,8 @@ export namespace Prisma {
 
   export type JobSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    salary?: boolean
+    type?: boolean
     employerId?: boolean
     title?: boolean
     company?: boolean
@@ -5378,6 +5405,8 @@ export namespace Prisma {
 
   export type JobSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    salary?: boolean
+    type?: boolean
     employerId?: boolean
     title?: boolean
     company?: boolean
@@ -5390,6 +5419,8 @@ export namespace Prisma {
 
   export type JobSelectScalar = {
     id?: boolean
+    salary?: boolean
+    type?: boolean
     employerId?: boolean
     title?: boolean
     company?: boolean
@@ -5399,7 +5430,7 @@ export namespace Prisma {
     postedAt?: boolean
   }
 
-  export type JobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "employerId" | "title" | "company" | "location" | "description" | "experience" | "postedAt", ExtArgs["result"]["job"]>
+  export type JobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "salary" | "type" | "employerId" | "title" | "company" | "location" | "description" | "experience" | "postedAt", ExtArgs["result"]["job"]>
   export type JobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     employer?: boolean | EmployerDefaultArgs<ExtArgs>
     applications?: boolean | Job$applicationsArgs<ExtArgs>
@@ -5426,6 +5457,8 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
+      salary: string
+      type: string
       employerId: number
       title: string
       company: string
@@ -5862,6 +5895,8 @@ export namespace Prisma {
    */
   interface JobFieldRefs {
     readonly id: FieldRef<"Job", 'Int'>
+    readonly salary: FieldRef<"Job", 'String'>
+    readonly type: FieldRef<"Job", 'String'>
     readonly employerId: FieldRef<"Job", 'Int'>
     readonly title: FieldRef<"Job", 'String'>
     readonly company: FieldRef<"Job", 'String'>
@@ -10781,6 +10816,7 @@ export namespace Prisma {
     password: 'password',
     name: 'name',
     role: 'role',
+    preferences: 'preferences',
     createdAt: 'createdAt'
   };
 
@@ -10812,6 +10848,8 @@ export namespace Prisma {
 
   export const JobScalarFieldEnum: {
     id: 'id',
+    salary: 'salary',
+    type: 'type',
     employerId: 'employerId',
     title: 'title',
     company: 'company',
@@ -10890,14 +10928,6 @@ export namespace Prisma {
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-  export const NullsOrder: {
-    first: 'first',
-    last: 'last'
-  };
-
-  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
   export const JsonNullValueFilter: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull,
@@ -10905,6 +10935,14 @@ export namespace Prisma {
   };
 
   export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -10955,20 +10993,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'DateTime'
-   */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-  /**
-   * Reference to a field of type 'DateTime[]'
-   */
-  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -10979,6 +11003,20 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime[]'
+   */
+  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 
@@ -11029,6 +11067,7 @@ export namespace Prisma {
     password?: StringNullableFilter<"User"> | string | null
     name?: StringNullableFilter<"User"> | string | null
     role?: EnumRoleFilter<"User"> | $Enums.Role
+    preferences?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     resumes?: ResumeListRelationFilter
     jobs?: JobListRelationFilter
@@ -11043,6 +11082,7 @@ export namespace Prisma {
     password?: SortOrderInput | SortOrder
     name?: SortOrderInput | SortOrder
     role?: SortOrder
+    preferences?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     resumes?: ResumeOrderByRelationAggregateInput
     jobs?: JobOrderByRelationAggregateInput
@@ -11060,6 +11100,7 @@ export namespace Prisma {
     password?: StringNullableFilter<"User"> | string | null
     name?: StringNullableFilter<"User"> | string | null
     role?: EnumRoleFilter<"User"> | $Enums.Role
+    preferences?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     resumes?: ResumeListRelationFilter
     jobs?: JobListRelationFilter
@@ -11074,6 +11115,7 @@ export namespace Prisma {
     password?: SortOrderInput | SortOrder
     name?: SortOrderInput | SortOrder
     role?: SortOrder
+    preferences?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
@@ -11091,6 +11133,7 @@ export namespace Prisma {
     password?: StringNullableWithAggregatesFilter<"User"> | string | null
     name?: StringNullableWithAggregatesFilter<"User"> | string | null
     role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
+    preferences?: JsonNullableWithAggregatesFilter<"User">
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
 
@@ -11218,6 +11261,8 @@ export namespace Prisma {
     OR?: JobWhereInput[]
     NOT?: JobWhereInput | JobWhereInput[]
     id?: IntFilter<"Job"> | number
+    salary?: StringFilter<"Job"> | string
+    type?: StringFilter<"Job"> | string
     employerId?: IntFilter<"Job"> | number
     title?: StringFilter<"Job"> | string
     company?: StringFilter<"Job"> | string
@@ -11234,6 +11279,8 @@ export namespace Prisma {
 
   export type JobOrderByWithRelationInput = {
     id?: SortOrder
+    salary?: SortOrder
+    type?: SortOrder
     employerId?: SortOrder
     title?: SortOrder
     company?: SortOrder
@@ -11253,6 +11300,8 @@ export namespace Prisma {
     AND?: JobWhereInput | JobWhereInput[]
     OR?: JobWhereInput[]
     NOT?: JobWhereInput | JobWhereInput[]
+    salary?: StringFilter<"Job"> | string
+    type?: StringFilter<"Job"> | string
     employerId?: IntFilter<"Job"> | number
     title?: StringFilter<"Job"> | string
     company?: StringFilter<"Job"> | string
@@ -11269,6 +11318,8 @@ export namespace Prisma {
 
   export type JobOrderByWithAggregationInput = {
     id?: SortOrder
+    salary?: SortOrder
+    type?: SortOrder
     employerId?: SortOrder
     title?: SortOrder
     company?: SortOrder
@@ -11288,6 +11339,8 @@ export namespace Prisma {
     OR?: JobScalarWhereWithAggregatesInput[]
     NOT?: JobScalarWhereWithAggregatesInput | JobScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Job"> | number
+    salary?: StringWithAggregatesFilter<"Job"> | string
+    type?: StringWithAggregatesFilter<"Job"> | string
     employerId?: IntWithAggregatesFilter<"Job"> | number
     title?: StringWithAggregatesFilter<"Job"> | string
     company?: StringWithAggregatesFilter<"Job"> | string
@@ -11526,6 +11579,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeCreateNestedManyWithoutUserInput
     jobs?: JobCreateNestedManyWithoutUsersInput
@@ -11540,6 +11594,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     jobs?: JobUncheckedCreateNestedManyWithoutUsersInput
@@ -11553,6 +11608,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUpdateManyWithoutUserNestedInput
     jobs?: JobUpdateManyWithoutUsersNestedInput
@@ -11567,6 +11623,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     jobs?: JobUncheckedUpdateManyWithoutUsersNestedInput
@@ -11581,6 +11638,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -11589,6 +11647,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -11598,6 +11657,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -11718,6 +11778,8 @@ export namespace Prisma {
   }
 
   export type JobCreateInput = {
+    salary?: string
+    type?: string
     title: string
     company: string
     location: string
@@ -11733,6 +11795,8 @@ export namespace Prisma {
 
   export type JobUncheckedCreateInput = {
     id?: number
+    salary?: string
+    type?: string
     employerId: number
     title: string
     company: string
@@ -11747,6 +11811,8 @@ export namespace Prisma {
   }
 
   export type JobUpdateInput = {
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -11762,6 +11828,8 @@ export namespace Prisma {
 
   export type JobUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     employerId?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
@@ -11777,6 +11845,8 @@ export namespace Prisma {
 
   export type JobCreateManyInput = {
     id?: number
+    salary?: string
+    type?: string
     employerId: number
     title: string
     company: string
@@ -11787,6 +11857,8 @@ export namespace Prisma {
   }
 
   export type JobUpdateManyMutationInput = {
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -11797,6 +11869,8 @@ export namespace Prisma {
 
   export type JobUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     employerId?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
@@ -12045,6 +12119,29 @@ export namespace Prisma {
     notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
     not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -12118,6 +12215,7 @@ export namespace Prisma {
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    preferences?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -12208,28 +12306,14 @@ export namespace Prisma {
     _min?: NestedEnumRoleFilter<$PrismaModel>
     _max?: NestedEnumRoleFilter<$PrismaModel>
   }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-  export type JsonNullableFilter<$PrismaModel = never> =
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
       >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
     equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
     path?: string[]
     mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
@@ -12244,6 +12328,23 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type UserScalarRelationFilter = {
@@ -12284,32 +12385,6 @@ export namespace Prisma {
   export type ResumeSumOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EmployerCountOrderByAggregateInput = {
@@ -12371,6 +12446,8 @@ export namespace Prisma {
 
   export type JobCountOrderByAggregateInput = {
     id?: SortOrder
+    salary?: SortOrder
+    type?: SortOrder
     employerId?: SortOrder
     title?: SortOrder
     company?: SortOrder
@@ -12387,6 +12464,8 @@ export namespace Prisma {
 
   export type JobMaxOrderByAggregateInput = {
     id?: SortOrder
+    salary?: SortOrder
+    type?: SortOrder
     employerId?: SortOrder
     title?: SortOrder
     company?: SortOrder
@@ -12398,6 +12477,8 @@ export namespace Prisma {
 
   export type JobMinOrderByAggregateInput = {
     id?: SortOrder
+    salary?: SortOrder
+    type?: SortOrder
     employerId?: SortOrder
     title?: SortOrder
     company?: SortOrder
@@ -13275,20 +13356,6 @@ export namespace Prisma {
     _min?: NestedEnumRoleFilter<$PrismaModel>
     _max?: NestedEnumRoleFilter<$PrismaModel>
   }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -13311,6 +13378,20 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedEnumApplicationStatusFilter<$PrismaModel = never> = {
@@ -13369,6 +13450,8 @@ export namespace Prisma {
   }
 
   export type JobCreateWithoutUsersInput = {
+    salary?: string
+    type?: string
     title: string
     company: string
     location: string
@@ -13383,6 +13466,8 @@ export namespace Prisma {
 
   export type JobUncheckedCreateWithoutUsersInput = {
     id?: number
+    salary?: string
+    type?: string
     employerId: number
     title: string
     company: string
@@ -13518,6 +13603,8 @@ export namespace Prisma {
     OR?: JobScalarWhereInput[]
     NOT?: JobScalarWhereInput | JobScalarWhereInput[]
     id?: IntFilter<"Job"> | number
+    salary?: StringFilter<"Job"> | string
+    type?: StringFilter<"Job"> | string
     employerId?: IntFilter<"Job"> | number
     title?: StringFilter<"Job"> | string
     company?: StringFilter<"Job"> | string
@@ -13613,6 +13700,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     jobs?: JobCreateNestedManyWithoutUsersInput
     applications?: ApplicationCreateNestedManyWithoutUserInput
@@ -13626,6 +13714,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     jobs?: JobUncheckedCreateNestedManyWithoutUsersInput
     applications?: ApplicationUncheckedCreateNestedManyWithoutUserInput
@@ -13654,6 +13743,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     jobs?: JobUpdateManyWithoutUsersNestedInput
     applications?: ApplicationUpdateManyWithoutUserNestedInput
@@ -13667,6 +13757,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     jobs?: JobUncheckedUpdateManyWithoutUsersNestedInput
     applications?: ApplicationUncheckedUpdateManyWithoutUserNestedInput
@@ -13675,6 +13766,8 @@ export namespace Prisma {
   }
 
   export type JobCreateWithoutEmployerInput = {
+    salary?: string
+    type?: string
     title: string
     company: string
     location: string
@@ -13689,6 +13782,8 @@ export namespace Prisma {
 
   export type JobUncheckedCreateWithoutEmployerInput = {
     id?: number
+    salary?: string
+    type?: string
     title: string
     company: string
     location: string
@@ -13794,6 +13889,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeCreateNestedManyWithoutUserInput
     applications?: ApplicationCreateNestedManyWithoutUserInput
@@ -13807,6 +13903,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     applications?: ApplicationUncheckedCreateNestedManyWithoutUserInput
@@ -13934,6 +14031,7 @@ export namespace Prisma {
     password?: StringNullableFilter<"User"> | string | null
     name?: StringNullableFilter<"User"> | string | null
     role?: EnumRoleFilter<"User"> | $Enums.Role
+    preferences?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
   }
 
@@ -13954,6 +14052,8 @@ export namespace Prisma {
   }
 
   export type JobCreateWithoutSkillsInput = {
+    salary?: string
+    type?: string
     title: string
     company: string
     location: string
@@ -13968,6 +14068,8 @@ export namespace Prisma {
 
   export type JobUncheckedCreateWithoutSkillsInput = {
     id?: number
+    salary?: string
+    type?: string
     employerId: number
     title: string
     company: string
@@ -13997,6 +14099,8 @@ export namespace Prisma {
   }
 
   export type JobUpdateWithoutSkillsInput = {
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -14011,6 +14115,8 @@ export namespace Prisma {
 
   export type JobUncheckedUpdateWithoutSkillsInput = {
     id?: IntFieldUpdateOperationsInput | number
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     employerId?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
@@ -14028,6 +14134,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeCreateNestedManyWithoutUserInput
     jobs?: JobCreateNestedManyWithoutUsersInput
@@ -14041,6 +14148,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     jobs?: JobUncheckedCreateNestedManyWithoutUsersInput
@@ -14054,6 +14162,8 @@ export namespace Prisma {
   }
 
   export type JobCreateWithoutShortlistsInput = {
+    salary?: string
+    type?: string
     title: string
     company: string
     location: string
@@ -14068,6 +14178,8 @@ export namespace Prisma {
 
   export type JobUncheckedCreateWithoutShortlistsInput = {
     id?: number
+    salary?: string
+    type?: string
     employerId: number
     title: string
     company: string
@@ -14101,6 +14213,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUpdateManyWithoutUserNestedInput
     jobs?: JobUpdateManyWithoutUsersNestedInput
@@ -14114,6 +14227,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     jobs?: JobUncheckedUpdateManyWithoutUsersNestedInput
@@ -14133,6 +14247,8 @@ export namespace Prisma {
   }
 
   export type JobUpdateWithoutShortlistsInput = {
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -14147,6 +14263,8 @@ export namespace Prisma {
 
   export type JobUncheckedUpdateWithoutShortlistsInput = {
     id?: IntFieldUpdateOperationsInput | number
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     employerId?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
@@ -14164,6 +14282,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeCreateNestedManyWithoutUserInput
     jobs?: JobCreateNestedManyWithoutUsersInput
@@ -14177,6 +14296,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     jobs?: JobUncheckedCreateNestedManyWithoutUsersInput
@@ -14190,6 +14310,8 @@ export namespace Prisma {
   }
 
   export type JobCreateWithoutApplicationsInput = {
+    salary?: string
+    type?: string
     title: string
     company: string
     location: string
@@ -14204,6 +14326,8 @@ export namespace Prisma {
 
   export type JobUncheckedCreateWithoutApplicationsInput = {
     id?: number
+    salary?: string
+    type?: string
     employerId: number
     title: string
     company: string
@@ -14237,6 +14361,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUpdateManyWithoutUserNestedInput
     jobs?: JobUpdateManyWithoutUsersNestedInput
@@ -14250,6 +14375,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     jobs?: JobUncheckedUpdateManyWithoutUsersNestedInput
@@ -14269,6 +14395,8 @@ export namespace Prisma {
   }
 
   export type JobUpdateWithoutApplicationsInput = {
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -14283,6 +14411,8 @@ export namespace Prisma {
 
   export type JobUncheckedUpdateWithoutApplicationsInput = {
     id?: IntFieldUpdateOperationsInput | number
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     employerId?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
@@ -14300,6 +14430,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeCreateNestedManyWithoutUserInput
     jobs?: JobCreateNestedManyWithoutUsersInput
@@ -14313,6 +14444,7 @@ export namespace Prisma {
     password?: string | null
     name?: string | null
     role?: $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     jobs?: JobUncheckedCreateNestedManyWithoutUsersInput
@@ -14341,6 +14473,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUpdateManyWithoutUserNestedInput
     jobs?: JobUpdateManyWithoutUsersNestedInput
@@ -14354,6 +14487,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     jobs?: JobUncheckedUpdateManyWithoutUsersNestedInput
@@ -14414,6 +14548,8 @@ export namespace Prisma {
   }
 
   export type JobUpdateWithoutUsersInput = {
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -14428,6 +14564,8 @@ export namespace Prisma {
 
   export type JobUncheckedUpdateWithoutUsersInput = {
     id?: IntFieldUpdateOperationsInput | number
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     employerId?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
@@ -14442,6 +14580,8 @@ export namespace Prisma {
 
   export type JobUncheckedUpdateManyWithoutUsersInput = {
     id?: IntFieldUpdateOperationsInput | number
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     employerId?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
@@ -14513,6 +14653,8 @@ export namespace Prisma {
 
   export type JobCreateManyEmployerInput = {
     id?: number
+    salary?: string
+    type?: string
     title: string
     company: string
     location: string
@@ -14522,6 +14664,8 @@ export namespace Prisma {
   }
 
   export type JobUpdateWithoutEmployerInput = {
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -14536,6 +14680,8 @@ export namespace Prisma {
 
   export type JobUncheckedUpdateWithoutEmployerInput = {
     id?: IntFieldUpdateOperationsInput | number
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -14550,6 +14696,8 @@ export namespace Prisma {
 
   export type JobUncheckedUpdateManyWithoutEmployerInput = {
     id?: IntFieldUpdateOperationsInput | number
+    salary?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -14616,6 +14764,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUpdateManyWithoutUserNestedInput
     applications?: ApplicationUpdateManyWithoutUserNestedInput
@@ -14629,6 +14778,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     applications?: ApplicationUncheckedUpdateManyWithoutUserNestedInput
@@ -14642,6 +14792,7 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
