@@ -258,7 +258,7 @@
 //     const doc = new pdfkit();
 //     const pdfFilename = `${Date.now()}-processed.pdf`;
 //     const pdfFilePath = path.join(uploadDir, pdfFilename);
-    
+
 //     doc.pipe(fs.createWriteStream(pdfFilePath));
 
 //     // Add ATS result, matched, and missing keywords to the PDF
@@ -601,6 +601,31 @@ app.use(cors());
 app.use(express.json());
 app.use(helmet());
 
+const authenticateUser = async (req, res, next) => {
+  try {
+    // Extract token from authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Verify Firebase token
+    const decodedToken = await admin.auth().verifyIdToken(token);
+
+    // Add decoded user to request object for use in route handlers
+    req.user = decodedToken;
+
+    console.log(req.user);
+
+    next();
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
+
 
 // app.post('/signup', async (req, res) => {
 
@@ -745,14 +770,14 @@ router.post('/signup', async (req, res) => {
 module.exports = router;
 
 app.post('/login', async (req, res) => {
-  const { googleToken } = req.body;
+  const { token } = req.body;
 
-  if (!googleToken) {
+  if (!token) {
     return res.status(400).json({ error: 'Token is required' });
   }
 
   try {
-    const decodedUser = await admin.auth().verifyIdToken(googleToken);
+    const decodedUser = await admin.auth().verifyIdToken(token);
     const email = decodedUser.email;
 
     if (!email) {
@@ -764,10 +789,12 @@ app.post('/login', async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
     if (!user.role) return res.status(400).json({ error: 'User role is missing' });
 
+    console.log(user);
     res.status(200).json({
       message: 'Login successful',
       user: {
         email: user.email,
+        id: user.id,
         name: user.name,
         role: user.role,
       },
@@ -898,11 +925,11 @@ app.post("/compare-a-job", async (req, res) => {
   try {
     const userId = req.body.userId;
     const jobId = req.body.jobId;
-    
-    if(!userId || !jobId) {
+
+    if (!userId || !jobId) {
       return res.status(400).json({ error: "User ID & Job Id are required" });
     }
-    
+
     // Get user with preferences
     const user = await prisma.user.findUnique({
       where: { id: parseInt(userId) },
@@ -913,12 +940,12 @@ app.post("/compare-a-job", async (req, res) => {
           }
         }
       }
-    });  
-    
-    if(!user) {
+    });
+
+    if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     // Get job with skills
     const job = await prisma.job.findUnique({
       where: { id: parseInt(jobId) },
@@ -926,14 +953,14 @@ app.post("/compare-a-job", async (req, res) => {
         skills: true
       }
     });
-    
-    if(!job) {
+
+    if (!job) {
       return res.status(404).json({ error: "Job not found" });
     }
-    
+
     // Extract skills from job
     const jobSkills = job.skills.map(skill => skill.name.toLowerCase());
-    
+
     // Initialize compatibility score and factors
     let compatibilityScore = 0;
     const matchFactors = {
@@ -946,64 +973,64 @@ app.post("/compare-a-job", async (req, res) => {
       },
       experienceLevel: false
     };
-    
+
     // Get user preferences (if they exist)
     const preferences = user.preferences || {};
-    
+
     // Match job title
-    if (preferences.desiredJobTitle && 
-        job.title.toLowerCase().includes(preferences.desiredJobTitle.toLowerCase())) {
+    if (preferences.desiredJobTitle &&
+      job.title.toLowerCase().includes(preferences.desiredJobTitle.toLowerCase())) {
       compatibilityScore += 25;
       matchFactors.title = true;
     }
-    
+
     // Match location
-    if (preferences.preferredLocation && 
-        job.location.toLowerCase().includes(preferences.preferredLocation.toLowerCase())) {
+    if (preferences.preferredLocation &&
+      job.location.toLowerCase().includes(preferences.preferredLocation.toLowerCase())) {
       compatibilityScore += 20;
       matchFactors.location = true;
     }
-    
+
     // Match salary range (basic string comparison - could be improved)
     if (preferences.salaryRange && job.salary) {
       // Extract numerics from salary strings for comparison
       const userSalaryMatch = preferences.salaryRange.match(/\d+/g);
       const jobSalaryMatch = job.salary.match(/\d+/g);
-      
-      if (userSalaryMatch && jobSalaryMatch && 
-          parseInt(jobSalaryMatch[0]) >= parseInt(userSalaryMatch[0])) {
+
+      if (userSalaryMatch && jobSalaryMatch &&
+        parseInt(jobSalaryMatch[0]) >= parseInt(userSalaryMatch[0])) {
         compatibilityScore += 15;
         matchFactors.salary = true;
       }
     }
-    
+
     // Match skills
     if (preferences.skills && Array.isArray(preferences.skills)) {
-      const userSkills = preferences.skills.map(skill => 
+      const userSkills = preferences.skills.map(skill =>
         typeof skill === 'string' ? skill.toLowerCase() : '');
-      
+
       // Find matching skills
       const matchedSkills = userSkills.filter(skill => jobSkills.includes(skill));
       const missingSkills = jobSkills.filter(skill => !userSkills.includes(skill));
-      
+
       matchFactors.skills.matched = matchedSkills;
       matchFactors.skills.missing = missingSkills;
-      
+
       // Calculate skill match percentage and add to score
-      const skillMatchPercentage = userSkills.length > 0 ? 
+      const skillMatchPercentage = userSkills.length > 0 ?
         (matchedSkills.length / userSkills.length) * 100 : 0;
-      
+
       compatibilityScore += Math.min(skillMatchPercentage * 0.4, 40); // Max 40 points for skills
     }
-    
+
     // Consider resume parsed data if available
     if (user.resumes && user.resumes.length > 0 && user.resumes[0].parsedData) {
       const parsedResume = user.resumes[0].parsedData;
-      
+
       // Additional analysis using resume data could be added here
       // For example: experience matching, education requirements, etc.
     }
-    
+
     // Determine overall compatibility
     let compatibilityLevel;
     if (compatibilityScore >= 80) {
@@ -1015,9 +1042,9 @@ app.post("/compare-a-job", async (req, res) => {
     } else {
       compatibilityLevel = "Low Match";
     }
-    
+
     // Return the comparison results
-    return res.status(200).json({ 
+    return res.status(200).json({
       user: {
         id: user.id,
         name: user.name,
@@ -1037,21 +1064,58 @@ app.post("/compare-a-job", async (req, res) => {
         factors: matchFactors
       }
     });
-    
+
   } catch (error) {
     console.error("Error comparing jobs:", error);
     res.status(500).json({ error: "Failed to compare job compatibility" });
   }
 });
 
+// Get current user's preferences
+app.get("/user/preferences", async (req, res) => {
+  try {
+    // Get user ID from authenticated session
+    // This assumes you have authentication middleware that adds userId to the request
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Fetch the user with their preferences
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        preferences: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Return just the preferences if they exist, otherwise an empty object
+    return res.status(200).json({
+      preferences: user.preferences || {}
+    });
+
+  } catch (error) {
+    console.error("Error fetching user preferences:", error);
+    res.status(500).json({ error: "Failed to fetch user preferences" });
+  }
+});
+
 app.get("/recommended-jobs/:userId", async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
-    
+
     if (!userId) {
       return res.status(400).json({ error: "User ID is required" });
     }
-    
+
     // Get user with preferences
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -1062,31 +1126,31 @@ app.get("/recommended-jobs/:userId", async (req, res) => {
           }
         }
       }
-    });  
-    
+    });
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     // Get all jobs with their skills
     const allJobs = await prisma.job.findMany({
       include: {
         skills: true
       }
     });
-    
+
     if (allJobs.length === 0) {
       return res.status(404).json({ message: "No jobs found in the database" });
     }
-    
+
     // Extract preferences
     const preferences = user.preferences || {};
-    
+
     // Calculate match score for each job
     const jobMatches = allJobs.map(job => {
       // Extract job skills
       const jobSkills = job.skills.map(skill => skill.name.toLowerCase());
-      
+
       // Initialize compatibility score and factors
       let compatibilityScore = 0;
       const matchFactors = {
@@ -1098,35 +1162,35 @@ app.get("/recommended-jobs/:userId", async (req, res) => {
           missing: []
         }
       };
-      
+
       // Match job title
-      if (preferences.desiredJobTitle && 
-          job.title.toLowerCase().includes(preferences.desiredJobTitle.toLowerCase())) {
+      if (preferences.desiredJobTitle &&
+        job.title.toLowerCase().includes(preferences.desiredJobTitle.toLowerCase())) {
         compatibilityScore += 25;
         matchFactors.title = true;
       }
-      
+
       // Match location
       if (preferences.preferredLocation && job.location) {
         // Check if remote preference is mentioned
         const isRemoteJob = job.location.toLowerCase().includes('remote');
-        const userWantsRemote = preferences.remotePreference && 
-                               (preferences.remotePreference.toLowerCase() === 'remote' || 
-                                preferences.remotePreference.toLowerCase() === 'hybrid');
-        
-        if ((isRemoteJob && userWantsRemote) || 
-            job.location.toLowerCase().includes(preferences.preferredLocation.toLowerCase())) {
+        const userWantsRemote = preferences.remotePreference &&
+          (preferences.remotePreference.toLowerCase() === 'remote' ||
+            preferences.remotePreference.toLowerCase() === 'hybrid');
+
+        if ((isRemoteJob && userWantsRemote) ||
+          job.location.toLowerCase().includes(preferences.preferredLocation.toLowerCase())) {
           compatibilityScore += 20;
           matchFactors.location = true;
         }
       }
-      
+
       // Match salary range
       if (preferences.salaryRange && job.salary) {
         // Extract numerics from salary strings for comparison
         const userSalaryMatch = preferences.salaryRange.match(/\d+/g);
         const jobSalaryMatch = job.salary.match(/\d+/g);
-        
+
         if (userSalaryMatch && jobSalaryMatch && jobSalaryMatch.length > 0) {
           // Compare the lower bound of job salary with user's expected lower bound
           if (parseInt(jobSalaryMatch[0]) >= parseInt(userSalaryMatch[0])) {
@@ -1135,26 +1199,26 @@ app.get("/recommended-jobs/:userId", async (req, res) => {
           }
         }
       }
-      
+
       // Match skills
       if (preferences.skills && Array.isArray(preferences.skills)) {
-        const userSkills = preferences.skills.map(skill => 
+        const userSkills = preferences.skills.map(skill =>
           typeof skill === 'string' ? skill.toLowerCase() : '');
-        
+
         // Find matching skills
         const matchedSkills = userSkills.filter(skill => jobSkills.includes(skill));
         const missingSkills = jobSkills.filter(skill => !userSkills.includes(skill));
-        
+
         matchFactors.skills.matched = matchedSkills;
         matchFactors.skills.missing = missingSkills;
-        
+
         // Calculate skill match percentage and add to score
-        const skillMatchPercentage = userSkills.length > 0 ? 
+        const skillMatchPercentage = userSkills.length > 0 ?
           (matchedSkills.length / userSkills.length) * 100 : 0;
-        
+
         compatibilityScore += Math.min(skillMatchPercentage * 0.4, 40); // Max 40 points for skills
       }
-      
+
       // Determine compatibility level
       let compatibilityLevel;
       if (compatibilityScore >= 80) {
@@ -1166,7 +1230,7 @@ app.get("/recommended-jobs/:userId", async (req, res) => {
       } else {
         compatibilityLevel = "Low Match";
       }
-      
+
       return {
         job: {
           id: job.id,
@@ -1185,20 +1249,20 @@ app.get("/recommended-jobs/:userId", async (req, res) => {
         }
       };
     });
-    
+
     // Sort jobs by match score (highest first)
     const sortedJobs = jobMatches.sort((a, b) => b.match.score - a.match.score);
-    
+
     // Filter out jobs with very low match scores (optional)
     const relevantJobs = sortedJobs.filter(job => job.match.score >= 30);
-    
+
     return res.status(200).json({
       totalJobs: allJobs.length,
       relevantJobsCount: relevantJobs.length,
       preferences: preferences,
       jobs: relevantJobs
     });
-    
+
   } catch (error) {
     console.error("Error finding recommended jobs:", error);
     res.status(500).json({ error: "Failed to find recommended jobs" });
@@ -1209,11 +1273,11 @@ app.post("/compare-jobs", async (req, res) => {
   try {
     const userId = req.body.userId;
     const jobId = req.body.jobId;
-    
-    if(!userId || !jobId) {
+
+    if (!userId || !jobId) {
       return res.status(400).json({ error: "User ID & Job Id are required" });
     }
-    
+
     // Get user with preferences
     const user = await prisma.user.findUnique({
       where: { id: parseInt(userId) },
@@ -1224,12 +1288,12 @@ app.post("/compare-jobs", async (req, res) => {
           }
         }
       }
-    });  
-    
-    if(!user) {
+    });
+
+    if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     // Get job with skills
     const job = await prisma.job.findUnique({
       where: { id: parseInt(jobId) },
@@ -1237,14 +1301,14 @@ app.post("/compare-jobs", async (req, res) => {
         skills: true
       }
     });
-    
-    if(!job) {
+
+    if (!job) {
       return res.status(404).json({ error: "Job not found" });
     }
-    
+
     // Extract skills from job
     const jobSkills = job.skills.map(skill => skill.name.toLowerCase());
-    
+
     // Initialize compatibility score and factors
     let compatibilityScore = 0;
     const matchFactors = {
@@ -1257,64 +1321,64 @@ app.post("/compare-jobs", async (req, res) => {
       },
       experienceLevel: false
     };
-    
+
     // Get user preferences (if they exist)
     const preferences = user.preferences || {};
-    
+
     // Match job title
-    if (preferences.desiredJobTitle && 
-        job.title.toLowerCase().includes(preferences.desiredJobTitle.toLowerCase())) {
+    if (preferences.desiredJobTitle &&
+      job.title.toLowerCase().includes(preferences.desiredJobTitle.toLowerCase())) {
       compatibilityScore += 25;
       matchFactors.title = true;
     }
-    
+
     // Match location
-    if (preferences.preferredLocation && 
-        job.location.toLowerCase().includes(preferences.preferredLocation.toLowerCase())) {
+    if (preferences.preferredLocation &&
+      job.location.toLowerCase().includes(preferences.preferredLocation.toLowerCase())) {
       compatibilityScore += 20;
       matchFactors.location = true;
     }
-    
+
     // Match salary range (basic string comparison - could be improved)
     if (preferences.salaryRange && job.salary) {
       // Extract numerics from salary strings for comparison
       const userSalaryMatch = preferences.salaryRange.match(/\d+/g);
       const jobSalaryMatch = job.salary.match(/\d+/g);
-      
-      if (userSalaryMatch && jobSalaryMatch && 
-          parseInt(jobSalaryMatch[0]) >= parseInt(userSalaryMatch[0])) {
+
+      if (userSalaryMatch && jobSalaryMatch &&
+        parseInt(jobSalaryMatch[0]) >= parseInt(userSalaryMatch[0])) {
         compatibilityScore += 15;
         matchFactors.salary = true;
       }
     }
-    
+
     // Match skills
     if (preferences.skills && Array.isArray(preferences.skills)) {
-      const userSkills = preferences.skills.map(skill => 
+      const userSkills = preferences.skills.map(skill =>
         typeof skill === 'string' ? skill.toLowerCase() : '');
-      
+
       // Find matching skills
       const matchedSkills = userSkills.filter(skill => jobSkills.includes(skill));
       const missingSkills = jobSkills.filter(skill => !userSkills.includes(skill));
-      
+
       matchFactors.skills.matched = matchedSkills;
       matchFactors.skills.missing = missingSkills;
-      
+
       // Calculate skill match percentage and add to score
-      const skillMatchPercentage = userSkills.length > 0 ? 
+      const skillMatchPercentage = userSkills.length > 0 ?
         (matchedSkills.length / userSkills.length) * 100 : 0;
-      
+
       compatibilityScore += Math.min(skillMatchPercentage * 0.4, 40); // Max 40 points for skills
     }
-    
+
     // Consider resume parsed data if available
     if (user.resumes && user.resumes.length > 0 && user.resumes[0].parsedData) {
       const parsedResume = user.resumes[0].parsedData;
-      
+
       // Additional analysis using resume data could be added here
       // For example: experience matching, education requirements, etc.
     }
-    
+
     // Determine overall compatibility
     let compatibilityLevel;
     if (compatibilityScore >= 80) {
@@ -1326,9 +1390,9 @@ app.post("/compare-jobs", async (req, res) => {
     } else {
       compatibilityLevel = "Low Match";
     }
-    
+
     // Return the comparison results
-    return res.status(200).json({ 
+    return res.status(200).json({
       user: {
         id: user.id,
         name: user.name,
@@ -1348,7 +1412,7 @@ app.post("/compare-jobs", async (req, res) => {
         factors: matchFactors
       }
     });
-    
+
   } catch (error) {
     console.error("Error comparing jobs:", error);
     res.status(500).json({ error: "Failed to compare job compatibility" });
@@ -1543,12 +1607,12 @@ app.post("/apply", async (req, res) => {
 
 app.put("/user/preferences", async (req, res) => {
   const { userId, preferences } = req.body;
-  
+
   // Check if required fields are provided
   if (!userId) {
     return res.status(400).json({ error: "User ID is required" });
   }
-  
+
   try {
     // Update the user with the new preferences
     const updatedUser = await prisma.user.update({
@@ -1557,10 +1621,10 @@ app.put("/user/preferences", async (req, res) => {
         preferences: preferences
       },
     });
-    
-    res.status(200).json({ 
+
+    res.status(200).json({
       message: "Job preferences updated successfully",
-      user: updatedUser 
+      user: updatedUser
     });
   } catch (error) {
     console.error("Error updating preferences:", error);
@@ -1568,7 +1632,33 @@ app.put("/user/preferences", async (req, res) => {
   }
 });
 
+app.get('/api/user/by-email/:email', authenticateUser, async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        preferences: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
